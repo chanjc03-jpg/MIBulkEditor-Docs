@@ -1,0 +1,15 @@
+# Changelog
+
+## 1.0.0
+- New: MI Bulk Editor tab. Lists the parameters of many Material Instance Constants in one table. Open it from **Tools > MI Bulk Editor**, or from the Content Browser with **Edit in MI Bulk Editor** (assets) and **Open Folder in MI Bulk Editor** (folders).
+- New: bulk editing of Scalar, Vector, Texture and Static Switch parameters, including parameters exposed through Material Functions. Static Switch changes rebuild the static permutation so they take effect.
+- New: Change Parent for many Material Instances at once.
+- New: **Revert to Parent** from the cell right-click menu, the row right-click menu, and the toolbar.
+- New: **Dry Run** preview. Writes nothing. Cleared overrides are listed separately, with a count.
+- New: **Apply** as one transaction. One Ctrl+Z undoes the whole batch. Every written value is read back and checked.
+- New: JSON change log for every Apply in `Saved/MIBulkEditor/ChangeLogs`, and **Revert Change Log...** to restore from a log.
+- New: CSV export and import (wide table, one row per Material Instance, typed column headers). Blank = no change, `#INHERIT` clears an override, `None` writes a None texture override, `N/A` marks parameters the Parent doesn't have.
+- Orphaned overrides are shown as grey read-only rows with a warning.
+- Never auto-saves; never deletes assets.
+- Limitations: global parameters only; Layer parameters are not supported. Orphaned overrides can't be edited in 1.0.
+- Supported: UE 5.0–5.8, Win64 editor.
