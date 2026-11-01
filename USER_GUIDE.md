@@ -17,11 +17,11 @@ Inside the tab you can also load assets yourself:
 ## 2. The table
 Each row is one parameter of one Material Instance.
 
-![Table overview: Thumbnails on with shared per-MI previews and collapse arrows, typed New Value editors, and sortable headers](screenshots/01_hero.png)
+![Table overview: Thumbnails on — one 64 px preview per parameter row, typed New Value editors, and sortable headers](screenshots/01_hero.png)
 
 | Column | Meaning |
 |---|---|
-| Asset | The Material Instance (when **Thumbnails** is on: shared preview + collapse for contiguous groups, or a per-row preview when rows are scattered) |
+| Asset | The Material Instance (when **Thumbnails** is on: each parameter row shows its own 64 px preview) |
 | Parent | Its current Parent material |
 | Type | Scalar, Vector, Texture or Switch (Static Switch) |
 | Parameter | Parameter name |
@@ -35,17 +35,15 @@ Click a column header (**Asset**, **Parent**, **Type**, **Parameter**, **Current
 Use **Filter** (asset, parameter or type), **Only overridden** and **Only pending** to narrow the list.
 
 **Preview thumbnails**
-Click **Thumbnails** on the toolbar to show a small preview (64 px) of each Material Instance. Click it again to hide them. When thumbnails are off, collapse controls are hidden too and every parameter row stays expanded.
-- When the same Material Instance's rows are **contiguous** after the current sort (for example default Asset order): that group shares **one** thumbnail on the left of the group, with a **collapse / expand** control. Collapsing hides the other parameter rows for that Material Instance until you expand it again.
-- When sorting **scatters** the same Material Instance so its rows are not adjacent: **each** visible row shows its own thumbnail (no shared group control).
-- Thumbnails are **off by default**.
+Click **Thumbnails** on the toolbar to show a small **64 px** preview on **every visible parameter row**. Click it again to hide them. There is **no** shared group thumbnail and **no** collapse / fold control — contiguous Asset order and scattered Parameter/Type order both show one preview per row.
+- Thumbnails are **off by default**. When they are off, no previews are shown (and there are still no fold controls).
 - The setting is remembered for your project when you close the tab or restart the editor. Each project has its own setting, so another project starts with thumbnails off.
-- Only the rows you can see render a thumbnail. After **Apply**, **Ctrl+Z** / **Ctrl+Y** or a **Revert to Parent**, the thumbnails of the changed Material Instances update. Dry Run and pending edits don't change thumbnails.
+- Only the rows you can see render a thumbnail. After **Apply**, **Ctrl+Z** / **Ctrl+Y** or a **Revert to Parent**, the thumbnails on the affected rows update. Dry Run and pending edits don't change thumbnails.
 - Thumbnails don't change CSV export or import, Dry Run or undo.
 - On very large lists (thousands of Material Instances), thumbnails can cost some scrolling performance. Turn them off if scrolling feels slow.
 - A Material Instance whose Parent or texture is missing, or that fails to load, shows a **grey placeholder** with a **yellow warning icon**. Hover over it to see exactly **Asset missing or failed to load**.
 
-![Thumbnails on — shared preview and collapse control per contiguous Material Instance group (same shot as table overview)](screenshots/01_hero.png)
+![Thumbnails on — one 64 px preview per parameter row (same shot as table overview)](screenshots/01_hero.png)
 
 **Supported parameters**
 - Scalar, Vector, Texture and Static Switch parameters.
@@ -157,7 +155,7 @@ Only materials and Material Instances are accepted. The Parent picker can't be c
 
 Dry Run lists the overrides that the new Parent doesn't have, so you can see what would become orphaned before you commit.
 
-![Use CB Parent and Change Parent — Parent column shows pending old -> new](screenshots/05_change_parent.png)
+![Use CB Parent — select a Material or Material Instance in the Content Browser, then click Use CB Parent; Parent column shows pending old -> new](screenshots/05_change_parent.png)
 
 ## 6. Dry Run
 Click **Dry Run** to see exactly what **Apply** would change. The values in the report are the same values the New Value editors show. Dry Run writes nothing: it does not modify assets and does not mark them as modified.
@@ -219,4 +217,4 @@ You can restore from a log after restarting the editor (the logs live on disk un
 
 ---
 
-*Screenshots: store gallery 01/02/05/06/08/09. 01/05 refreshed 2026-11-01 ~16:51 Asia/Shanghai from `host_5.8_thumb_group` (01: grouped thumbs + collapse; 05: Use CB Parent). 02 from `host_5.8_d1b`; 08 from `host_5.8_d1` (multi-select).*
+*Screenshots: store gallery 01/02/05/06/08/09. **01 / 05** reshot 2026-11-01 ~18:43 Asia/Shanghai from `host_5.8_thumb_group` DLL 18:13 (per-row thumbs, no fold; Use CB Parent + Parent read-only). 02 from `host_5.8_d1b`; 08 from `host_5.8_d1` (multi-select).*
