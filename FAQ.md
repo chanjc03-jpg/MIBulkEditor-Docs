@@ -47,7 +47,13 @@ Open the Color Picker from the Vector swatch and type the values into the **R**,
 - **Static Switch, Texture and Parent:** not applicable.
 
 **Why can't I clear the Parent (set it to None)?**
-Every Material Instance needs a Parent, and the Parent is not an override, so there is nothing to "inherit". The Parent picker has no None option and no **Inherit** button. To change the Parent, pick another material or Material Instance. In a CSV file, a blank `Parent` cell means no change.
+Every Material Instance needs a Parent, and the Parent is not an override, so there is nothing to "inherit". The Parent picker has no None option and no **Inherit** button. To change the Parent, pick another material or Material Instance (see below). In a CSV file, a blank `Parent` cell means no change.
+
+**How do I Change Parent from the Content Browser?**
+Select a **Material** or **Material Instance** in the Content Browser, select the table rows you want to re-parent, then click **Use CB Parent** on the toolbar. You do not type a path. Selected rows get a pending Parent change (`old -> new` in the Parent column) until Dry Run and Apply. If nothing useful is selected in the Content Browser, the button shows a clear message and does not change pending values. You can also use the Parent asset picker or **Change Parent**. See [USER_GUIDE.md](USER_GUIDE.md) section 5.
+
+**How do preview thumbnails and collapse work?**
+Turn on **Thumbnails** on the toolbar. Contiguous rows for the same Material Instance share one preview with a collapse/expand control; collapsing hides the other parameter rows for that Material Instance. If sorting scatters the same Material Instance so its rows are not adjacent, each visible row shows its own thumbnail (no shared collapse). With Thumbnails off, collapse controls are hidden and every row stays expanded. See [USER_GUIDE.md](USER_GUIDE.md) section 2.
 
 **Does CSV export include my pending edits?**
 No. **Export CSV** exports the applied values only. If pending edits exist, you get a notice that they were not exported. Run **Dry Run** and **Apply** first if you want them in the file.

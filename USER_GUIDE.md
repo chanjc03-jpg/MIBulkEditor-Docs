@@ -17,11 +17,11 @@ Inside the tab you can also load assets yourself:
 ## 2. The table
 Each row is one parameter of one Material Instance.
 
-![Table overview with typed New Value editors, thumbnails, and sortable headers](screenshots/01_hero.png)
+![Table overview: Thumbnails on with shared per-MI previews and collapse arrows, typed New Value editors, and sortable headers](screenshots/01_hero.png)
 
 | Column | Meaning |
 |---|---|
-| Asset | The Material Instance (with a preview thumbnail when **Thumbnails** is on) |
+| Asset | The Material Instance (when **Thumbnails** is on: shared preview + collapse for contiguous groups, or a per-row preview when rows are scattered) |
 | Parent | Its current Parent material |
 | Type | Scalar, Vector, Texture or Switch (Static Switch) |
 | Parameter | Parameter name |
@@ -35,8 +35,9 @@ Click a column header (**Asset**, **Parent**, **Type**, **Parameter**, **Current
 Use **Filter** (asset, parameter or type), **Only overridden** and **Only pending** to narrow the list.
 
 **Preview thumbnails**
-Click **Thumbnails** on the toolbar to show a small preview (64 px) of each Material Instance. Click it again to hide them.
-- **One thumbnail per Material Instance**, on that Material Instance's **first row**, to the left of its name. Later parameter rows for the same Material Instance do not repeat the thumbnail.
+Click **Thumbnails** on the toolbar to show a small preview (64 px) of each Material Instance. Click it again to hide them. When thumbnails are off, collapse controls are hidden too and every parameter row stays expanded.
+- When the same Material Instance's rows are **contiguous** after the current sort (for example default Asset order): that group shares **one** thumbnail on the left of the group, with a **collapse / expand** control. Collapsing hides the other parameter rows for that Material Instance until you expand it again.
+- When sorting **scatters** the same Material Instance so its rows are not adjacent: **each** visible row shows its own thumbnail (no shared group control).
 - Thumbnails are **off by default**.
 - The setting is remembered for your project when you close the tab or restart the editor. Each project has its own setting, so another project starts with thumbnails off.
 - Only the rows you can see render a thumbnail. After **Apply**, **Ctrl+Z** / **Ctrl+Y** or a **Revert to Parent**, the thumbnails of the changed Material Instances update. Dry Run and pending edits don't change thumbnails.
@@ -44,7 +45,7 @@ Click **Thumbnails** on the toolbar to show a small preview (64 px) of each Mate
 - On very large lists (thousands of Material Instances), thumbnails can cost some scrolling performance. Turn them off if scrolling feels slow.
 - A Material Instance whose Parent or texture is missing, or that fails to load, shows a **grey placeholder** with a **yellow warning icon**. Hover over it to see exactly **Asset missing or failed to load**.
 
-![Thumbnails on — preview beside the first row of each Material Instance (same shot as table overview)](screenshots/01_hero.png)
+![Thumbnails on — shared preview and collapse control per contiguous Material Instance group (same shot as table overview)](screenshots/01_hero.png)
 
 **Supported parameters**
 - Scalar, Vector, Texture and Static Switch parameters.
@@ -148,11 +149,15 @@ After a successful **Apply**, the table history is empty: with focus on the tabl
 Revert to Parent marks the selected overridden cells as `#INHERIT` (the same as the **Inherit** button and `#INHERIT` in a CSV file). After you apply, the New Value editor shows the inherited value again. Cells that are already inherited are not changed. Like any other edit, nothing is written until you run **Dry Run** and **Apply**, and the result can be undone with one **Ctrl+Z**. Orphaned overrides can't be reverted in 1.0.
 
 ## 5. Changing the Parent
-Select rows of the Material Instances you want to re-parent and choose the new Parent in the **Parent** asset picker (in the Parent / New Value cell — there is no separate Change Parent button and no **Inherit** button on Parent): search in the drop-down, or drag a material or Material Instance from the Content Browser onto the picker. Only materials and Material Instances are accepted. The Parent picker can't be cleared to **None**: every Material Instance needs a Parent, so there is no None or clear option (the same rule as the `Parent` column in a CSV file, where a blank cell means no change). The picker doesn't offer the Material Instance itself or any of its child Material Instances, because that would create a parent loop. The change stays pending until Apply. You can also change Parents through the `Parent` column of a CSV file (see [CSV_FORMAT.md](CSV_FORMAT.md)).
+Select the Material Instance rows you want to re-parent, then set a new Parent in either of these ways:
+- **Use CB Parent** on the toolbar: select a **Material** or **Material Instance** in the Content Browser, then click **Use CB Parent**. Selected table rows get a pending Parent change (the Parent column shows `old -> new`). You do not type a path by hand.
+- The **Parent** asset picker on a row (or **Change Parent** on the toolbar where shown): search in the drop-down, or drag a material or Material Instance from the Content Browser onto the picker.
+
+Only materials and Material Instances are accepted. The Parent picker can't be cleared to **None**: every Material Instance needs a Parent, so there is no None or clear option (the same rule as the `Parent` column in a CSV file, where a blank cell means no change). There is no **Inherit** button on Parent. The picker and **Use CB Parent** both refuse the Material Instance itself or any parent that would create a loop. If the Content Browser has nothing selected, or the selection is the wrong type, **Use CB Parent** shows a clear message and does not change pending values. The change stays pending until Apply. You can also change Parents through the `Parent` column of a CSV file (see [CSV_FORMAT.md](CSV_FORMAT.md)).
 
 Dry Run lists the overrides that the new Parent doesn't have, so you can see what would become orphaned before you commit.
 
-![Change Parent with the Parent asset picker](screenshots/05_change_parent.png)
+![Use CB Parent and Change Parent — Parent column shows pending old -> new](screenshots/05_change_parent.png)
 
 ## 6. Dry Run
 Click **Dry Run** to see exactly what **Apply** would change. The values in the report are the same values the New Value editors show. Dry Run writes nothing: it does not modify assets and does not mark them as modified.
@@ -214,4 +219,4 @@ You can restore from a log after restarting the editor (the logs live on disk un
 
 ---
 
-*Screenshots: store gallery 01/02/05/06/08/09, frozen 2026-11-01 (Asia/Shanghai). 01/02 from `host_5.8_d1b` (all-column sort arrows); 08 from `host_5.8_d1` (multi-select).*
+*Screenshots: store gallery 01/02/05/06/08/09. 01/05 refreshed 2026-11-01 ~16:51 Asia/Shanghai from `host_5.8_thumb_group` (01: grouped thumbs + collapse; 05: Use CB Parent). 02 from `host_5.8_d1b`; 08 from `host_5.8_d1` (multi-select).*
