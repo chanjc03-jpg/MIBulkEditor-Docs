@@ -21,8 +21,8 @@ The type prefix keeps parameters with the same name apart: `Scalar:Roughness` an
 ## 2. Cell values
 | Type | Format | Example |
 |---|---|---|
-| Scalar | Number | `0.35` |
-| Vector | `(R=…,G=…,B=…,A=…)`, `r,g,b,a`, or `r,g,b` (3 components: Alpha is set to 1). In double quotes in the CSV file, because it contains commas | `"(R=1,G=0.5,B=0,A=1)"`, `"1,0.5,0,1"` or `"1,0.5,0"` |
+| Scalar | Number. Negative values are allowed, and values are not clamped to the slider range set on the material parameter | `0.35`, `-2.5` |
+| Vector | Linear colour values: `(R=…,G=…,B=…,A=…)`, `r,g,b,a`, or `r,g,b` (3 components: Alpha is set to 1). Values above 1 (HDR) and below 0 are kept. Not Hex / sRGB. In double quotes in the CSV file, because it contains commas | `"(R=1,G=0.5,B=0,A=1)"`, `"1,0.5,0,1"` or `"1,0.5,0"` |
 | Texture | Object path, or `None` | `/Game/T/T_A.T_A` |
 | Switch | `true` / `false`, `1` / `0`, `yes` / `no` or `on` / `off` | `true` |
 
@@ -38,7 +38,7 @@ The type prefix keeps parameters with the same name apart: `Scalar:Roughness` an
 **Case:** `#INHERIT`, `N/A`, `None`, the Switch values (`true` / `false`, `yes` / `no`, `on` / `off`) and parameter names are all case-insensitive. `#inherit`, `n/a`, `NONE`, `TRUE`, `Yes`, `OFF` and `Scalar:roughness` all work.
 
 ## 4. Import rules
-- **Import never writes directly.** Importing loads the edits and runs a **Dry Run**. Nothing is written until you click **Apply**.
+- **Import never writes directly.** Importing loads the edits and runs a **Dry Run**. The imported edits also appear in the table's **New Value** editors. Nothing is written until you click **Apply**.
 - **Blank means no change.** Deleting a value or leaving cells empty can't clear your overrides by accident. To clear an override on purpose, write `#INHERIT`.
 - **Missing or unknown type prefix: the whole import is aborted.** If any parameter column header has no type prefix or an unknown one (for example `Metal` or `Scaler:Metal`), the import stops, **nothing is written**, and the error message names the column.
 - A file without an `Asset` column is rejected, and nothing is written.
@@ -50,6 +50,8 @@ The type prefix keeps parameters with the same name apart: `Scalar:Roughness` an
 - Export, then import with no edits = zero changes in the Dry Run.
 
 ## 5. Export rules
+- Export writes the values the Material Instances have now (applied values). **Pending edits in the table that you haven't applied are never exported**; if any exist, you get a notice that they were not exported.
+- Vector values are written as linear values, exactly as stored (a colour entered as Hex `#808080` in the table is exported as about `0.2159`).
 - Overridden parameters: the override value.
 - Inherited parameters: blank.
 - Parameters the Material Instance's Parent doesn't have: `N/A`.
