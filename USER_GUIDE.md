@@ -217,4 +217,4 @@ You can restore from a log after restarting the editor (the logs live on disk un
 
 ---
 
-*Screenshots: store gallery 01/02/05/06/08/09. **01 / 05** reshot 2026-11-01 ~18:43 Asia/Shanghai from `host_5.8_thumb_group` DLL 18:13 (per-row thumbs, no fold; Use CB Parent + Parent read-only). 02 from `host_5.8_d1b`; 08 from `host_5.8_d1` (multi-select).*
+*Screenshots: store gallery 01/02/05/06/08/09. **01 / 05** reshot 2026-11-02 ~11:43 Asia/Shanghai from `host_5.8_thumb_group` DLL 11:18 (per-row thumbs on every parameter row, no fold; 05: Thumbnails OFF, Parent read-only / no typed path, Use CB Parent pending `M_Perf -> M_Perf_Alt`). 02 from `host_5.8_d1b`; 08 from `host_5.8_d1` (multi-select).*
