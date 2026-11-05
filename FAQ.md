@@ -24,7 +24,7 @@ No. Dry Run only shows what Apply would do. It does not modify assets or mark th
 Press **Ctrl+Z** once. Each Apply is one transaction, so one Ctrl+Z undoes the whole batch.
 
 **Can I undo an edit before I apply it?**
-Yes. Pending edits have their own in-memory history in the table: with focus on the table, **Ctrl+Z** undoes the last pending edit and **Ctrl+Y** redoes it. Typing Enter, toggling a checkbox, picking or dragging an asset, **Inherit**, **Revert to Parent**, Clear/Discard Pending, Color Picker **OK**, releasing a Scalar drag, and a CSV import (one step for the whole batch) each add one step. The history clears on close, Reload, successful Apply, or Revert All; after Apply, table-focused Ctrl+Z undoes the Apply in the editor. This doesn't touch your assets or the editor's undo history before Apply. See [USER_GUIDE.md](USER_GUIDE.md) section 3.
+No. Pending edits can't be undone: the table has no undo history, so **Ctrl+Z** and **Ctrl+Y** don't change pending edits, and edits removed with **Clear Pending Edit** or **Discard Pending** can't be restored. To back pending edits out, use **Revert to Parent** or **Discard Pending** (or right-click > **Clear Pending Edit** for the selected cells). Only **Apply** can be undone: one **Ctrl+Z** undoes the whole batch. See [USER_GUIDE.md](USER_GUIDE.md) section 3.
 
 **Can I undo after closing the editor?**
 Use the JSON change log. Every Apply writes one to `<Project>/Saved/MIBulkEditor/ChangeLogs/`. Click **Revert Change Log...**, choose the log, review the Dry Run and click **Apply**.
@@ -36,7 +36,7 @@ Use the JSON change log. Every Apply writes one to `<Project>/Saved/MIBulkEditor
 - `None` (Texture only): writes a None texture override (choose None in the Texture picker, or write `None` in a CSV file). It does not restore the Parent's texture; use `#INHERIT` or **Revert to Parent** for that.
 
 **Can I type values into the table?**
-The **New Value** column uses an editor for each type instead of a text box: a checkbox for Static Switches, a colour swatch that opens the Color Picker (with eyedropper) for Vectors, a number box you can type into or drag for Scalars, and asset pickers for Textures and Parents. See [USER_GUIDE.md](USER_GUIDE.md) section 3. To work with values as text, use CSV export and import.
+The **New Value** column uses an editor for each type instead of a text box: a checkbox for Static Switches, a colour swatch that opens the Color Picker (with eyedropper) for Vectors, a number box you can type into or drag for Scalars, and an asset picker for Textures. The Parent column is read-only; change Parents with **Use Content Browser Parent** or the parent slot on the toolbar (see [USER_GUIDE.md](USER_GUIDE.md) section 5). See [USER_GUIDE.md](USER_GUIDE.md) section 3. To work with values as text, use CSV export and import.
 
 **How do I enter HDR colours (values above 1)?**
 Open the Color Picker from the Vector swatch and type the values into the **R**, **G**, **B** numeric fields, or use the brightness slider. The **Hex** field is always sRGB and can't represent values above 1. HDR values are stored unchanged and appear unchanged in Dry Run and CSV files; only the swatch display is clipped. Colours are stored as linear values, so a Hex colour such as `#808080` shows up as about `0.2159` in a CSV file.
@@ -46,14 +46,8 @@ Open the Color Picker from the Vector swatch and type the values into the **R**,
 - **Vector:** the Color Picker can't create negative values, but a negative component that a colour already has is kept as long as you don't change that colour. To set a negative component, write it in a CSV file (for example `"(R=-0.5,G=0.2,B=1,A=1)"`) or type it into the **inline R, G, B, A** fields next to the swatch in the cell (not the Color Picker's spin boxes); both give the same result.
 - **Static Switch, Texture and Parent:** not applicable.
 
-**Why can't I clear the Parent (set it to None)?**
-Every Material Instance needs a Parent, and the Parent is not an override, so there is nothing to "inherit". The Parent picker has no None option and no **Inherit** button. To change the Parent, pick another material or Material Instance (see below). In a CSV file, a blank `Parent` cell means no change.
-
-**How do I Change Parent from the Content Browser?**
-Select a **Material** or **Material Instance** in the Content Browser, select the table rows you want to re-parent, then click **Use CB Parent** on the toolbar. You do not type a path. Selected rows get a pending Parent change (`old -> new` in the Parent column) until Dry Run and Apply. If nothing useful is selected in the Content Browser, the button shows a clear message and does not change pending values. **Use CB Parent** also refuses a self-parent or a parent cycle at click time (status message, no pending change). You can also use the Parent asset picker or **Change Parent**. See [USER_GUIDE.md](USER_GUIDE.md) section 5.
-
-**How do preview thumbnails work?**
-Turn on **Thumbnails** on the toolbar. Every visible parameter row shows its own 64 px preview — there is no shared group thumbnail and no collapse/fold control, whether rows for the same Material Instance are contiguous or scattered by sorting. Turn **Thumbnails** off to hide the previews. See [USER_GUIDE.md](USER_GUIDE.md) section 2.
+**Can I remove a Material Instance's Parent?**
+No. Every Material Instance needs a Parent, and the Parent is not an override, so there is nothing to "inherit" and there is no **Inherit** button on Parent. You can clear the parent slot on the toolbar, but that only forgets the remembered parent: it never changes a Material Instance, and pending Parent changes you already made stay. To change the Parent, use **Use Content Browser Parent** or the parent slot (see [USER_GUIDE.md](USER_GUIDE.md) section 5). In a CSV file, a blank `Parent` cell means no change. Landscape Material Instances can't be used as a parent.
 
 **Does CSV export include my pending edits?**
 No. **Export CSV** exports the applied values only. If pending edits exist, you get a notice that they were not exported. Run **Dry Run** and **Apply** first if you want them in the file.

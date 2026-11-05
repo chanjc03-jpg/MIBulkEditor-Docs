@@ -22,7 +22,7 @@ Each row is one parameter of one Material Instance.
 | Column | Meaning |
 |---|---|
 | Asset | The Material Instance (when **Thumbnails** is on: each parameter row shows its own 64 px preview) |
-| Parent | Its current Parent material |
+| Parent | Its current Parent material. Read-only: a pending Parent change shows as `old -> new`. Hover over the cell to see the full path (see section 5) |
 | Type | Scalar, Vector, Texture or Switch (Static Switch) |
 | Parameter | Parameter name |
 | Current | The value the Material Instance uses now |
@@ -35,8 +35,8 @@ Click a column header (**Asset**, **Parent**, **Type**, **Parameter**, **Current
 Use **Filter** (asset, parameter or type), **Only overridden** and **Only pending** to narrow the list.
 
 **Preview thumbnails**
-Click **Thumbnails** on the toolbar to show a small **64 px** preview on **every visible parameter row**. Click it again to hide them. There is **no** shared group thumbnail and **no** collapse / fold control — contiguous Asset order and scattered Parameter/Type order both show one preview per row.
-- Thumbnails are **off by default**. When they are off, no previews are shown (and there are still no fold controls).
+Click **Thumbnails** on the toolbar to show a small **64 px** preview on **every visible parameter row**. Click it again to hide them. There is **no** thumbnail shared across rows and **no** collapse / expand control — contiguous Asset order and scattered Parameter/Type order both show one preview per row.
+- Thumbnails are **off by default**. When they are off, no previews are shown (and there are still no collapse / expand controls).
 - The setting is remembered for your project when you close the tab or restart the editor. Each project has its own setting, so another project starts with thumbnails off.
 - Only the rows you can see render a thumbnail. After **Apply**, **Ctrl+Z** / **Ctrl+Y** or a **Revert to Parent**, the thumbnails on the affected rows update. Dry Run and pending edits don't change thumbnails.
 - Thumbnails don't change CSV export or import, Dry Run or undo.
@@ -56,7 +56,7 @@ An orphaned override is an override stored on a Material Instance for a paramete
 ## 3. Editing values
 The **New Value** column gives each parameter type its own editor. There is no free-text box: you pick, drag or tick the value, so a pending edit always has the right type.
 
-Whatever editor you use, **only the pending edit changes**. Nothing is written to the asset, the asset is not marked as modified, and no editor undo step (**Edit > Undo History**) is created until you run **Dry Run** and **Apply**. Pending edits have their own undo inside the table; see *Undoing pending edits* below.
+Whatever editor you use, **only the pending edit changes**. Nothing is written to the asset, the asset is not marked as modified, and no editor undo step (**Edit > Undo History**) is created until you run **Dry Run** and **Apply**. Pending edits can't be undone; to back them out, use **Revert to Parent** or **Discard Pending** (see *Undoing pending edits* below).
 
 ![New Value close-up: Switch, Vector RGBA, Scalar, Texture + Inherit; multi-select Edited N rows](screenshots/08_typed_controls_closeup.png)
 
@@ -67,7 +67,7 @@ Tick the box for `true`, clear it for `false`. Static Switch uses a **checkbox o
 The swatch shows the current colour. Next to the swatch, the cell also has **inline R, G, B, A** number fields (and an optional Hex field) for precise values, including negatives and values the Color Picker won't accept. Click the swatch to open Unreal's standard **Color Picker**:
 - Set the colour with the colour wheel, the sliders or the numeric fields, including **Alpha**.
 - Use the **eyedropper** in the Color Picker to pick a colour from a viewport, the Content Browser or anywhere on your screen. It is available on every supported engine version (UE 5.0–5.8); like elsewhere in Unreal, it is hidden in VR Mode.
-- The swatch previews the colour while the picker is open. **OK** makes it your pending edit and adds one step to the table's edit history (see *Undoing pending edits* below). **Cancel**, or closing the picker window with its **X** button, puts back exactly the value you had before you opened the picker and leaves nothing behind: no pending edit and no history step.
+- The swatch previews the colour while the picker is open. **OK** makes it your pending edit. **Cancel**, or closing the picker window with its **X** button, puts back exactly the value you had before you opened the picker and leaves nothing behind: no pending edit.
 - **Hex is always sRGB.** The **Hex** field shows and accepts sRGB colours (for example `#808080`). MI Bulk Editor stores colours as **linear** values, so a Hex entry is converted: `#808080` is stored as about `0.2159`. The linear numbers are what you see in the Dry Run report, in the change log and in an exported CSV file.
 - **HDR colours (values above 1):** Hex can't represent values above 1. Enter HDR values in the picker's **R**, **G**, **B** numeric fields or with the brightness slider. They are kept as they are through Apply, undo and CSV export/import.
 - The swatch can only display colours up to 1, so an HDR colour looks clipped in the swatch. That is only the display: the stored value is unchanged.
@@ -76,7 +76,7 @@ The swatch shows the current colour. Next to the swatch, the cell also has **inl
 ![Color Picker from a Vector swatch, with eyedropper](screenshots/09_color_picker.png)
 
 **Scalar: number box**
-Type a number and press **Enter**, or **drag** left/right on the box to adjust the value. While you drag, the table only previews the value; releasing the mouse makes one pending edit and adds one step to the table's edit history, however far you dragged. Press **Esc** to cancel what you are typing. The decimal point is always `.`.
+Type a number and press **Enter**, or **drag** left/right on the box to adjust the value. While you drag, the table only previews the value; releasing the mouse makes one pending edit, however far you dragged. Press **Esc** to cancel what you are typing. The decimal point is always `.`.
 
 Negative values are allowed, and typed values are never clamped. The slider range set on the material parameter only limits **dragging**: a drag stops at the ends of that range, but you can type any value, including one outside the range.
 
@@ -88,8 +88,8 @@ Negative values are allowed, and typed values are never clamped. The slider rang
 **Inherit button (Scalar, Vector, Switch and Texture)**
 Scalar, Vector, Static Switch and Texture cells have an **Inherit** button to the right of the editor (tooltip: *Restore inherited value (#INHERIT)*). It clears the override, so the value comes from the Parent again. It does exactly the same as writing `#INHERIT` in a CSV file and the same as **Revert to Parent**: the cell shows `#INHERIT` until you apply, and Dry Run lists it under **Override clears**. On a cell that already inherits, it changes nothing.
 
-**Parent: asset picker**
-The Parent has no **Inherit** button, because the Parent is not an override. See section 5.
+**Parent: read-only column**
+The Parent column has no editor in the row. It shows the current Parent as read-only text, and a pending Parent change as `old -> new`. Hover over the cell to see the full path. To change the Parent, use **Use Content Browser Parent** or the parent slot on the toolbar (see section 5). The Parent has no **Inherit** button, because the Parent is not an override.
 
 | Pending edit | Result on Apply |
 |---|---|
@@ -103,9 +103,11 @@ Cells marked `N/A` (the Material Instance's Parent doesn't have that parameter) 
 **Editing many Material Instances at once:** select the rows you want to change, then set the value in the New Value editor of **one of the selected rows**. Every selected row with the **same parameter name and the same type** gets the same pending edit.
 
 If the selected rows don't all have the same value, the editor shows that instead of one value:
-- Scalar number boxes and the Texture and Parent asset pickers show `Multiple Values`.
+- Scalar number boxes and the Texture asset picker show `Multiple Values`.
 - A Static Switch checkbox shows the mixed (indeterminate) state.
 - A Vector colour swatch shows diagonal stripes; hover over it to see `Multiple Values`.
+
+The Parent column is read-only, so it never shows `Multiple Values`: each row shows its own Parent (or its pending `old -> new` change).
 
 Setting a value gives all of those rows the same pending edit. The status bar then tells you what happened, for example:
 - `Edited 12 rows.`
@@ -117,18 +119,11 @@ Selected rows of another type or another parameter name, `N/A` cells, and read-o
 To forget edits, right-click and choose **Clear Pending Edit** for the selected cells, or click **Discard Pending** to drop all pending edits.
 
 **Undoing pending edits**
-Before you apply, pending edits have their own edit history in the table (in memory for the current window only). With keyboard focus on the table, **Ctrl+Z** undoes the last pending edit and **Ctrl+Y** redoes it.
-Each of these adds **one** history step (a multi-row edit still counts as one step):
-- Pressing **OK** in the Color Picker; releasing a Scalar or inline RGBA drag; typing a value and pressing **Enter**
-- Toggling a Static Switch checkbox; picking or dragging a Texture or Parent; **Inherit**; **Revert to Parent**
-- **Clear Pending Edit** / **Discard Pending**; importing a CSV (the whole import is one step)
-- Pressing **Cancel** or closing the Color Picker with **X** adds no step; neither do Dry Run or Export CSV
+Pending edits can't be undone. The table has no undo or redo history for pending edits: **Ctrl+Z** and **Ctrl+Y** don't change them, and pending edits you remove with **Clear Pending Edit** or **Discard Pending** can't be brought back. To back pending edits out, use **Revert to Parent** or **Discard Pending** (or right-click > **Clear Pending Edit** for the selected cells). Clearing the parent slot doesn't change pending edits either (see section 5).
 
-If you set a control back to the cell's current effective value (for example toggle a Switch back to what it already is), the pending edit is cleared automatically—an inherited cell does **not** become an explicit override—but that click still adds one history step.
+If you set a control back to the cell's current effective value (for example toggle a Switch back to what it already is), the pending edit is cleared automatically—an inherited cell does **not** become an explicit override. The same goes for the Parent: setting a row's Parent to the Parent it already has leaves no pending Parent change (see section 5).
 
-This history only changes pending edits. It never touches the assets and adds nothing to the editor's **Edit > Undo History**. It is cleared when you close the window, **Reload**, run a successful **Apply**, or **Revert All**.
-
-After a successful **Apply**, the table history is empty: with focus on the table, **Ctrl+Z** is handed to the editor so you can undo that Apply as one transaction. You can also restore a batch later with **Revert Change Log...** (see section 8).
+Only **Apply** can be undone. After a successful **Apply**, **Ctrl+Z** (**Edit > Undo**) undoes that Apply as one editor transaction, and **Ctrl+Y** redoes it. You can also restore a batch later with **Revert Change Log...** (see section 8).
 
 **Pending edits and CSV export:** **Export CSV** always exports the values the Material Instances have now (what has been applied), never pending edits that you haven't applied yet. If you export while pending edits exist, MI Bulk Editor tells you that they were not exported. Apply them first if you want them in the file.
 
@@ -144,18 +139,33 @@ After a successful **Apply**, the table history is empty: with focus on the tabl
 - the **row right-click** menu,
 - the **Revert to Parent** toolbar button (works on the current selection, multi-select allowed).
 
-Revert to Parent marks the selected overridden cells as `#INHERIT` (the same as the **Inherit** button and `#INHERIT` in a CSV file). After you apply, the New Value editor shows the inherited value again. Cells that are already inherited are not changed. Like any other edit, nothing is written until you run **Dry Run** and **Apply**, and the result can be undone with one **Ctrl+Z**. Orphaned overrides can't be reverted in 1.0.
+Revert to Parent marks the selected overridden cells as `#INHERIT` (the same as the **Inherit** button and `#INHERIT` in a CSV file). After you apply, the New Value editor shows the inherited value again. Cells that are already inherited are not changed. Like any other edit, nothing is written until you run **Dry Run** and **Apply**; once applied, the result can be undone with one **Ctrl+Z**. Orphaned overrides can't be reverted in 1.0.
 
 ## 5. Changing the Parent
-Select the Material Instance rows you want to re-parent, then set a new Parent in either of these ways:
-- **Use CB Parent** on the toolbar: select a **Material** or **Material Instance** in the Content Browser, then click **Use CB Parent**. Selected table rows get a pending Parent change (the Parent column shows `old -> new`). You do not type a path by hand.
-- The **Parent** asset picker on a row (or **Change Parent** on the toolbar where shown): search in the drop-down, or drag a material or Material Instance from the Content Browser onto the picker.
+The Parent area of the toolbar has one button, **Use Content Browser Parent**, and a **parent slot** to the right of the button. These are the only ways to change a Parent: the **Parent** column in the table is read-only. It shows a pending change as `old -> new`; hover over a cell to see the full path.
 
-Only materials and Material Instances are accepted. The Parent picker can't be cleared to **None**: every Material Instance needs a Parent, so there is no None or clear option (the same rule as the `Parent` column in a CSV file, where a blank cell means no change). There is no **Inherit** button on Parent. The picker and **Use CB Parent** both refuse the Material Instance itself or any parent that would create a loop. If the Content Browser has nothing selected, or the selection is the wrong type, **Use CB Parent** shows a clear message and does not change pending values. The change stays pending until Apply. You can also change Parents through the `Parent` column of a CSV file (see [CSV_FORMAT.md](CSV_FORMAT.md)).
+- **Use Content Browser Parent**: select a **Material** or **Material Instance** in the Content Browser, then click **Use Content Browser Parent**. The button always uses what is selected in the Content Browser at the moment you click. The selected asset becomes the new parent and replaces the parent shown in the slot (the slot and its thumbnail update). If several assets are selected, the button uses the first one, and the status bar tells you it used the first of N.
+- **Parent slot**: drag a Material or Material Instance from the Content Browser onto the slot, or open the slot's drop-down and pick one. The slot shows the parent's thumbnail. You can't type a path into the slot. The slot's drop-down also has **Edit**, **Copy**, **Paste** and **Clear** (there is no right-click menu on the slot).
+
+**With rows selected**: select the Material Instance rows you want to re-parent first. Clicking the button, or dropping or picking a parent in the slot, gives every selected row a pending Parent change (the Parent column shows `old -> new`), and the status bar shows `Edited N rows.` Rows that are not selected don't change.
+
+**With no rows selected**: clicking **Use Content Browser Parent** doesn't change anything yet. The status bar asks you to select rows first, and the parent is remembered (it appears in the slot). Dropping or picking a parent in the slot with no rows selected also just remembers it. Then select the rows and click **Use Content Browser Parent** again (with the parent still selected in the Content Browser), or drop or pick the parent in the slot again.
+
+**Nothing usable selected in the Content Browser**: only materials and Material Instances are accepted. If nothing is selected in the Content Browser, or the selection is not a Material or Material Instance, clicking **Use Content Browser Parent** shows `No Material or Material Instance selected in the Content Browser; parent unchanged` in the status bar. The slot keeps its parent, and no pending change is added.
+
+**Pasting a parent**: **Paste** in the slot's drop-down accepts only an existing **Material** or **Material Instance** (an asset path, or a reference copied with **Copy**). A pasted parent is treated like one you picked in the slot: with rows selected it gives them a pending Parent change, with no rows selected it is only remembered, and it goes through the same loop check (see below). Anything else is refused and the slot stays unchanged: a path that doesn't exist, text that isn't an asset path, or an asset that isn't a Material or Material Instance. Pasting `None` works like **Clear**.
+
+**Same Parent as now**: if the parent you set is the Parent a row already has, that row gets no pending Parent change (the Parent column doesn't show `old -> old`). If the row already had a pending Parent change, setting it back to its original Parent clears that pending change. The status bar counts only the rows that got a pending change and adds how many already had that Parent, for example `Edited 2 rows. (1 unchanged)`; those rows are not counted as rejected. If every selected row already has that Parent, the status bar shows `No changes; parent already set.` and nothing is added.
+
+**Clearing the slot**: choose **Clear** in the slot's drop-down (pasting `None` does the same). Clearing only forgets the remembered parent. Pending Parent changes you already made stay, and no new pending change is added. Clearing the slot never removes a Material Instance's Parent: every Material Instance needs a Parent (the same rule as the `Parent` column in a CSV file, where a blank cell means no change). There is no **Inherit** button on Parent.
+
+**Loops are refused straight away.** Both the button and the slot refuse a parent that would create a loop: the Material Instance itself, or one of its own children (including a child through another pending Parent change). The check happens when you click, drop or pick, before anything is added: the status bar says the change was rejected, and no pending change is created. If every selected row is rejected, the parent slot keeps the value it had before: the rejected parent is not shown or remembered in the slot. If only some of the selected rows are rejected, the slot shows the new parent, only the accepted rows get the pending change (rejected rows keep their current parent), and the status bar shows `Edited N rows. Rejected M …` (N = accepted rows, M = rejected). Apply checks again as a safety net.
+
+The change stays pending until Apply. Pending Parent changes have no undo: back them out with **Discard Pending**, or set the Parent back to the original (see section 3). You can also change Parents through the `Parent` column of a CSV file (see [CSV_FORMAT.md](CSV_FORMAT.md)).
 
 Dry Run lists the overrides that the new Parent doesn't have, so you can see what would become orphaned before you commit.
 
-![Use CB Parent — select a Material or Material Instance in the Content Browser, then click Use CB Parent; Parent column shows pending old -> new](screenshots/05_change_parent.png)
+![Parent area: the Use Content Browser Parent button and the parent slot to its right (thumbnail; drag from the Content Browser or pick from the drop-down); the Parent column shows a pending old -> new change](screenshots/05_change_parent.png)
 
 ## 6. Dry Run
 Click **Dry Run** to see exactly what **Apply** would change. The values in the report are the same values the New Value editors show. Dry Run writes nothing: it does not modify assets and does not mark them as modified.
@@ -176,7 +186,7 @@ The summary also shows how many Material Instances will rebuild their static per
 ## 7. Apply
 1. Click **Apply** and confirm.
 2. If the assets changed since you reviewed the Dry Run, MI Bulk Editor shows the updated Dry Run instead and asks you to press **Apply** again.
-3. All changes are applied as **one transaction**. Work in the New Value editors (dragging, picking colours and so on) adds no editor undo steps; before Apply it only uses the table's own history for pending edits (see *Undoing pending edits* in section 3). **One Ctrl+Z undoes the whole batch** (Ctrl+Y redoes it).
+3. All changes are applied as **one transaction**. Work in the New Value editors (dragging, picking colours and so on) adds no editor undo steps, and pending edits can't be undone before Apply (see *Undoing pending edits* in section 3). **One Ctrl+Z undoes the whole batch** (Ctrl+Y redoes it).
 4. Every written value is read back and checked. The result report shows how many changes were verified and lists any failures.
 5. A JSON change log is written (see section 8).
 6. Changed Material Instances are marked as modified. **Nothing is saved automatically: use Save All yourself** when you are happy with the result.
@@ -186,7 +196,7 @@ The summary also shows how many Material Instances will rebuild their static per
 ## 8. Undo and change logs
 **Editor undo:** each Apply (including a revert from a log) is one editor transaction. Press **Ctrl+Z** once to undo the whole batch; the New Value editors and the table show the restored values.
 
-**Table undo (before Apply):** pending edits that you haven't applied yet aren't in the editor's undo history. Undo and redo them in the table instead (**Ctrl+Z** / **Ctrl+Y** with focus on the table; see section 3).
+**Pending edits (before Apply):** pending edits can't be undone. They aren't in the editor's undo history, and the table has no undo history of its own, so **Ctrl+Z** / **Ctrl+Y** don't change them. To back them out, use **Revert to Parent** or **Discard Pending** (see section 3).
 
 ![Revert Change Log dialog](screenshots/06_undo_log.png)
 
@@ -217,4 +227,4 @@ You can restore from a log after restarting the editor (the logs live on disk un
 
 ---
 
-*Screenshots: store gallery 01/02/05/06/08/09. **01 / 05** reshot 2026-11-02 ~11:43 Asia/Shanghai from `host_5.8_thumb_group` DLL 11:18 (per-row thumbs on every parameter row, no fold; 05: Thumbnails OFF, Parent read-only / no typed path, Use CB Parent pending `M_Perf -> M_Perf_Alt`). 02 from `host_5.8_d1b`; 08 from `host_5.8_d1` (multi-select).*
+*Screenshots: store gallery 01/02/05/06/08/09. **01** and **05** reshot 2026-11-05 Asia/Shanghai for the new Parent UI (`Use Content Browser Parent` → parent slot with thumbnail; Parent column `old -> new`; per-row thumbs on). 02 from `host_5.8_d1b`; 08 from `host_5.8_d1` (multi-select).*
